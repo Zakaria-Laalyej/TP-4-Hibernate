@@ -1,0 +1,79 @@
+package com.demo.dao;
+
+
+import com.demo.entities.Machine;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import com.demo.util.HibernateUtil;
+import org.hibernate.query.Query;
+
+import java.util.List;
+
+public class MachineDao implements IDao<Machine> {
+
+    @Override
+    public boolean create(Machine o) {
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
+            session.save(o);
+            tx.commit();
+            return true;
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
+            return false;
+        }
+    }
+    public List<Machine> findByMarque(String marque) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Query<Machine> query = session.createQuery("from Machine m where m.marque = :marque", Machine.class);
+            query.setParameter("marque", marque);
+            return query.list();
+        }
+    }
+
+    @Override
+    public boolean delete(Machine o) {
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
+            session.delete(o);
+            tx.commit();
+            return true;
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean update(Machine o) {
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
+            session.update(o);
+            tx.commit();
+            return true;
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public Machine getById(int id) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.get(Machine.class, id);
+        }
+    }
+
+    @Override
+    public List<Machine> getAll() {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("from Machine", Machine.class).list();
+        }
+    }
+}
